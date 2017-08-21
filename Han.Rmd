@@ -1,0 +1,84 @@
+---
+title: "Machine Learning final project"
+author: "Han Zhang"
+date: "August 18, 2017"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+## R Markdown
+
+The goal of this project is to predict the manner in which human did the exercise. This is the "classe" variable in the training set. I built a random forest model to predict the "classe". I will also use the prediction model to predict 20 different test cases.
+
+
+## Reading data and cleaning
+
+```{r}
+training_Url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+testing_Url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+train <- read.csv(training_Url, header = T, na.strings = c("NA", "", "DIV/0!"))
+test <- read.csv(testing_Url, header = T, na.strings = c("NA", "", "DIV/0!"))
+
+# Summarize raw data
+dim(train)
+dim(test)
+
+# cleaning
+train_1 <- train[,!apply(train, 2, function(x) {sum(is.na(x))>2500})]
+test_1 <- test[,!apply(test, 2, function(x) {sum(is.na(x))>10})]
+training <- train_1[, c(8:dim(train_1)[2])]
+testing <- test_1[, c(8:dim(test_1)[2])]
+summary(training)
+```
+
+
+## Data preprocessing
+
+```{r}
+library(caret)
+library(rattle)
+library(randomForest)
+library(survival)
+
+preobj <- preProcess(training[, 1:52], method = c("center", "scale", "knnImpute"))
+newtrain <- predict(preobj, training[, c(1:52)])
+newtrain$classe <- training$classe
+newtest <- predict(preobj, testing[, c(1:52)])
+newtest$problem_id <- testing$problem_id
+
+inTrain <- createDataPartition(y = newtrain$classe, p=0.7, list = F)
+train_Train <- newtrain[inTrain,]
+train_Test <- newtrain[-inTrain,]
+```
+
+
+## Random Forest Model
+
+```{r}
+set.seed(12345)
+modelfit1 <- train(classe~., data=train_Train, method="rf", trControl=trainControl(method="repeatedcv", number=5, repeats=3))
+plot(varImp(modelfit1), top=20,  main="The most importance 20 variables")
+```
+# Data validation on RF Model
+
+```{r}
+pred_1 <- predict(modelfit1, newdata=train_Test[, 1:52])
+confusionMatrix(pred_1, train_Test$classe)
+```
+It showed great accuracy, sensitivity and specificity, so I will use this model to predict the testing dataset.
+
+
+## Apply model1 to validation dataset
+
+```{r}
+prediction <- predict(modelfit1, newdata=newtest[, 1:52])
+```
+
+## Conclusion
+
+The ConfusionMatrix achieved more than 99% accuracy, sensitivity ans specificity. This model was great for the final prediction The prediction for validation data No.1-20 were:
+
+```{r}
+prediction
+```
