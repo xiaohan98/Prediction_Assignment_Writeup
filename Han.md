@@ -165,6 +165,10 @@ library(caret)
 ## Loading required package: ggplot2
 ```
 
+```
+## Warning: package 'ggplot2' was built under R version 3.3.3
+```
+
 ```r
 library(rattle)
 ```
@@ -228,6 +232,8 @@ train_Test <- newtrain[-inTrain,]
 
 ## Random Forest Model
 
+# Since Random Forest model is great for dealing with category prediction questions, here I use it first to build a model. 70% of training data was used to build the model and cross validation was used in the model to avoid overfitting. The model was tested on another 30% training data to check the performance.
+
 
 ```r
 set.seed(12345)
@@ -249,35 +255,35 @@ confusionMatrix(pred_1, train_Test$classe)
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1672    8    0    0    0
-##          B    2 1126   10    0    0
-##          C    0    5 1013   18    2
-##          D    0    0    3  945    0
+##          A 1673    2    0    0    0
+##          B    1 1133   10    1    0
+##          C    0    4 1009   15    0
+##          D    0    0    7  947    2
 ##          E    0    0    0    1 1080
 ## 
 ## Overall Statistics
-##                                          
-##                Accuracy : 0.9917         
-##                  95% CI : (0.989, 0.9938)
-##     No Information Rate : 0.2845         
-##     P-Value [Acc > NIR] : < 2.2e-16      
-##                                          
-##                   Kappa : 0.9895         
-##  Mcnemar's Test P-Value : NA             
+##                                           
+##                Accuracy : 0.9927          
+##                  95% CI : (0.9902, 0.9947)
+##     No Information Rate : 0.2845          
+##     P-Value [Acc > NIR] : < 2.2e-16       
+##                                           
+##                   Kappa : 0.9908          
+##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9988   0.9886   0.9873   0.9803   0.9982
-## Specificity            0.9981   0.9975   0.9949   0.9994   0.9998
-## Pos Pred Value         0.9952   0.9895   0.9759   0.9968   0.9991
-## Neg Pred Value         0.9995   0.9973   0.9973   0.9962   0.9996
+## Sensitivity            0.9994   0.9947   0.9834   0.9824   0.9982
+## Specificity            0.9995   0.9975   0.9961   0.9982   0.9998
+## Pos Pred Value         0.9988   0.9895   0.9815   0.9906   0.9991
+## Neg Pred Value         0.9998   0.9987   0.9965   0.9966   0.9996
 ## Prevalence             0.2845   0.1935   0.1743   0.1638   0.1839
-## Detection Rate         0.2841   0.1913   0.1721   0.1606   0.1835
-## Detection Prevalence   0.2855   0.1934   0.1764   0.1611   0.1837
-## Balanced Accuracy      0.9985   0.9930   0.9911   0.9898   0.9990
+## Detection Rate         0.2843   0.1925   0.1715   0.1609   0.1835
+## Detection Prevalence   0.2846   0.1946   0.1747   0.1624   0.1837
+## Balanced Accuracy      0.9995   0.9961   0.9898   0.9903   0.9990
 ```
-It showed great accuracy, sensitivity and specificity, so I will use this model to predict the testing dataset.
+The model showed great accuracy (99.2%), so the out of sample error = 1 - accuracy = 0.8%. Since the random forest model give great performance, so I will use this model to predict the testing dataset.
 
 
 ## Apply model1 to validation dataset
@@ -289,7 +295,7 @@ prediction <- predict(modelfit1, newdata=newtest[, 1:52])
 
 ## Conclusion
 
-The ConfusionMatrix achieved more than 99% accuracy, sensitivity ans specificity. This model was great for the final prediction The prediction for validation data No.1-20 were:
+The ConfusionMatrix achieved more than 99% sensitivity and specificity  and only 0.8% out of sample error. This model was great for the final prediction The prediction for validation data No.1-20 were:
 
 
 ```r
